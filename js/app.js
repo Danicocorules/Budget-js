@@ -133,6 +133,16 @@ function errorBill( msg ) {
     }, 1000);
 }
 
+function errorBudget( msg ) {
+    let errorMsg = document.createElement('p');
+    errorMsg.classList.add('alert','alert-danger')
+    errorMsg.textContent = msg;
+    budgetForm.appendChild(errorMsg);
+    
+    setTimeout(() => {
+        errorMsg.remove();
+    }, 1000);
+}
 
 
 
