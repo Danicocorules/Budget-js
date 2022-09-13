@@ -3,9 +3,11 @@ const budgetIn = document.querySelector('#budgetUser');
 const budgetForm = document.querySelector('#add-budget');
 const budgetSection = document.querySelector('.intro-precio');
 const originalBudget = document.querySelector('#original-budget');
-const remainingBudget = document.querySelector('#remaining-budget');
+const remaningBudget = document.querySelector('#remaning-budget');
 const formBudget = document.querySelector('#agregar-gasto');
 const billList = document.querySelector('#bills ul');
+const addBtn = document.querySelector('#add-btn');
+const deleteBtn = document.querySelector('.delete-bill');
 
 // Eventos
 budgetIn.addEventListener('blur', getBudget );
@@ -13,20 +15,23 @@ formBudget.addEventListener('submit', newBill);
 
 // Clases
 class Budget {
-    constructor( budget, remainingBudget ) {
+    constructor( budget, remaningBudget ) {
         this.budget = budget;
-        this.remainingBudget = remainingBudget;
+        this.remaningBudget = remaningBudget;
         this.bills = [];
     }
 
     addBill( bill ) {
         this.bills = [ ...this.bills, bill ];
+        ui.emptyBillMsg();
+        // ToDo - Eliminar msg y que aparezca si es necesario
     }
 
-    calcRemaining() {
+    calcRemaning() {
         const spent = this.bills.reduce( ( total, acc ) => total + acc.billAmount, 0 );
-        this.remainingBudget = this.budget - spent;
-        ui.updateRemaining( this.remainingBudget );
+        this.remaningBudget = this.budget - spent;
+        ui.updateRemaning( this.remaningBudget );
+        ui.calcRemaning();
     }
 }
 
@@ -54,15 +59,48 @@ class Ui {
         budgetRest.id = 'budgetRest';
         budgetRest.textContent = value;
     
-        remainingBudget.appendChild(budgetRestBox);
+        remaningBudget.appendChild(budgetRestBox);
         budgetRestBox.appendChild(budgetRest);
     }
     
-    updateRemaining( value ) {
+    updateRemaning( value ) {
         let remaning = document.querySelector('#budgetRest');
         remaning.value = value;
         remaning.textContent = value;
     }
+
+    emptyBillMsg() {
+        const msg = document.querySelector('#bills p');
+
+        if ( budget.bills.length === 1 ) {
+            msg.remove();
+            return;
+        };
+
+        if ( budget.bills.length === 0  ) {
+            // ToDo - Hacer aparecer el msg
+        }
+    }
+
+    calcRemaning() {
+        const remaning = budget.remaningBudget;
+
+        if ( remaning < 0 ) {
+            document.querySelector('p.budget.remaning').classList.add('negative');       
+
+            const negativeBudgetMsg = document.createElement('p');
+            negativeBudgetMsg.textContent = 'You are in negative, you have to delete some expense to add another.';
+            negativeBudgetMsg.classList.add('msg-negative')
+
+            const msgPos = document.querySelector('.secundario');
+            msgPos.insertBefore(negativeBudgetMsg, msgPos.children[1] );
+
+            // Desabilitamos el formulario
+            addBtn.disabled = true;
+        } 
+
+    }
+
 }
 
 let budget;
@@ -108,9 +146,13 @@ function newBill(e) {
 
     const bill = { billName, billAmount, id: Date.now() }
     budget.addBill(bill);
-    budget.calcRemaining();
+    budget.calcRemaning();
     printsBillsHTML();
     formBudget.reset();
+}
+
+function deleteBill() {
+    console.log('asd');
 }
 
 function printsBillsHTML() {
@@ -162,225 +204,3 @@ function errorBudget( msg ) {
         errorMsg.remove();
     }, 1000);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // VARIABLES
-// const presuForm = document.querySelector( '#presu' );
-// const formulario = document.querySelector('#agregar-gasto');
-// const listaGastos = document.querySelector('#gastos ul');
-
-// // EVENTS
-// iniciarEventos();
-// function iniciarEventos() {
-//     presuForm.addEventListener( 'blur', verificarPresupuesto );
-//     formulario.addEventListener( 'submit', agregarGasto );
-// }
-
-// // CLASS
-// class PresupuestoGestion {
-//     constructor( presupuesto ) {
-//         this.presupuesto = presupuesto;
-//         this.restante = presupuesto;
-//         this.gastos = [];
-//     }
-
-//     nuevoGasto( gasto ) {
-//         this.gastos = [ ...this.gastos, gasto ];
-//         this.calcularGasto();
-//     }
-
-//     calcularGasto() {
-//         const gastado = this.gastos.reduce( (acc, gasto ) => acc + gasto.cantidad ,0 );
-//         this.restante = this.presupuesto - gastado;
-//     }
-//     eliminarGasto(id) {
-//         this.gastos = this.gastos.filter( gasto => gasto.id !== Number(id) );
-//         gastoRestante(this.gastos);
-//         this.calcularGasto();
-//     }
-// }
-
-// class UI {
-//     insertarPresupuesto( cantidad ) {
-//         let { presupuesto, restante } = cantidad;
-//         document.querySelector( '#total' ).textContent = presupuesto;
-//         document.querySelector( '#restante' ).textContent = restante;
-//     }
-
-//     imprimirAlerta( mensaje ) {
-//         let divMensaje = document.createElement('div');
-//         divMensaje.classList.add('text-center','alert');
-//         divMensaje.classList.add('alert-danger');
-//         document.querySelector('.primario').insertBefore(divMensaje, formulario);
-
-//         switch(mensaje) {
-//             case 'Campos vacíos':
-//                 divMensaje.textContent = 'Se han de llenar todos los campos.'
-//                 break;
-            
-//             case 'Cantidad Incorrecta':
-//                 divMensaje.textContent = 'Cantidad no valida';
-//                 break;
-        
-//             case 'Gasto Correcto':
-//                 divMensaje.textContent = 'Gasto Correcto';
-//                 divMensaje.classList.remove('alert-danger');
-//                 divMensaje.classList.add('alert-success');
-//                 break;
-            
-//             case 'Presupuesto agotado':
-//                 divMensaje.textContent = 'Se ha agotado el presupuesto';
-//                 break;
-//             }
-
-//         if (mensaje === 'Campos vacíos') {
-//             divMensaje.classList.add('alert-danger');
-//             divMensaje.textContent = 'Se han de llenar todos los campos.'
-//             document.querySelector('.primario').insertBefore(divMensaje, formulario);
-//         }       
-//         setTimeout( () => {
-//             divMensaje.remove();
-//         }, 1000 );
-//     }
-
-//     mostrarHTML ( gastos ) {
-        
-//         this.limpiarHTML();
-
-//         gastos.forEach( gasto => {
-
-//             const { concepto, cantidad, id } = gasto;
-
-//             let liGasto = document.createElement('li');
-//             liGasto.className = 'list-group-item d-flex justify-content-between align-items-center';
-//             liGasto.dataset.id = id;
-            
-//             liGasto.innerHTML = `${concepto}
-//                 <span class="badge badge-primary badge-pill">$ ${cantidad}</span>`;
-
-//             const btnBorrar = document.createElement('button');
-//             btnBorrar.classList.add('btn', 'btn-danger', 'borrar-gasto');
-//             btnBorrar.textContent = 'Borrar';
-//             btnBorrar.onclick = () => {
-//                 presu.eliminarGasto(liGasto.dataset.id);
-//             };
-//             liGasto.appendChild(btnBorrar);
-
-//             listaGastos.appendChild(liGasto);
-//         });
-//     }
-
-//     actualizarRestante(restante, presupuesto) {
-//         document.querySelector( '#restante' ).textContent = restante;
-        
-//         const restanteBox = document.querySelector( '.restante' );
-
-//         if( restante <= (presupuesto / 4) ) {
-//             restanteBox.classList.remove('alert-success', 'alert-warning');
-//             restanteBox.classList.add('alert-danger');
-
-//         } else if ( restante <= (presupuesto / 2) ) {
-//             restanteBox.classList.remove('alert-success', 'alert-warning');
-//             restanteBox.classList.add('alert-warning');
-//         }
-
-//         if ( restante < 0 ) {
-//             ui.imprimirAlerta('Presupuesto agotado');
-//             formulario.querySelector('button[type=submit]').disabled = true;;
-//         }
-//     }
-    
-//     limpiarHTML() {
-//         while (listaGastos.firstChild) {
-//             listaGastos.removeChild(listaGastos.firstChild);
-//         }
-//     }
-// }
-
-// const ui = new UI();
-// let presu;
-
-// // FUNCTIONS
-// function verificarPresupuesto(e) {
-//     let presuUsuario = parseFloat(e.target.value);
-    
-//     if ( presuUsuario === '' || isNaN(presuUsuario) || presuUsuario <= 0  ) {
-//         // TO DO --> que pasa si no pasa la comprobación?
-//     } 
-//     presu = new PresupuestoGestion( presuUsuario );
-//     ui.insertarPresupuesto(presu);
-// }
-
-// function agregarGasto(e) {
-//     e.preventDefault();
-
-//     //Leemos el formulario
-//     let concepto = document.querySelector('#gasto').value;
-//     let cantidad = document.querySelector('#cantidad').value;
-
-//     //Validamos el form
-//     if (concepto === '' || cantidad === '') {
-//         ui.imprimirAlerta('Campos vacíos');
-//         return;
-//     } else if ( cantidad <= 0 || isNaN(cantidad) ) {
-//         ui.imprimirAlerta('Cantidad Incorrecta');
-//         return;
-//     }
-    
-//     const gasto = {
-//         concepto: concepto,
-//         cantidad: Number(cantidad),
-//         id: Date.now()
-//     }
-    
-//     presu.nuevoGasto(gasto);
-
-//     ui.imprimirAlerta('Gasto Correcto');
-    
-//     const { gastos, restante, presupuesto } = presu; 
-//     ui.mostrarHTML(gastos);
-//     ui.actualizarRestante(restante, presupuesto);
-
-//     formulario.reset();
-// }
-
-// function gastoRestante( gasto ) {
-//     ui.mostrarHTML( gasto );
-
-
-// }

@@ -57,6 +57,14 @@ p.budget.actual {
 p.budget.remaning {
     background-color: #d4edda;
 }
+p.remaning.budget.negative{
+    background-color: #edd4d7;
+}
+p.msg-negative {
+    border: 2px solid #ff9eaa;
+    padding: 10px;
+    border-radius: 7px;
+}
 span#total,
 span#budgetRest {
     font-weight: 400;
