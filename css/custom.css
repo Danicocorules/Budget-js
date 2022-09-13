@@ -6,15 +6,15 @@ background: linear-gradient(to right, #004e92, #000428);
 header {
     margin: 30px 0;
 }
-.contenido {
+.content {
     padding:20px;
 }
-.contenido-principal {
+.main-content {
     background-color: white;
     padding: 30px;
     border-radius: 20px;
 }
-.intro-precio {
+.intro-price {
     background-color: white;
     padding: 30px;
     border-radius: 20px;

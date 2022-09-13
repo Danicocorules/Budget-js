@@ -1,19 +1,19 @@
-// Variables y Selectores
+// Variables & Selectors
 const budgetIn = document.querySelector('#budgetUser');
 const budgetForm = document.querySelector('#add-budget');
-const budgetSection = document.querySelector('.intro-precio');
+const budgetSection = document.querySelector('.intro-price');
 const originalBudget = document.querySelector('#original-budget');
 const remaningBudget = document.querySelector('#remaning-budget');
-const formBudget = document.querySelector('#agregar-gasto');
+const formBudget = document.querySelector('#add-expense');
 const billList = document.querySelector('#bills ul');
 const addBtn = document.querySelector('#add-btn');
 const deleteBtn = document.querySelector('.delete-bill');
 
-// Eventos
+// Events
 budgetIn.addEventListener('blur', getBudget );
 formBudget.addEventListener('submit', newBill);
 
-// Clases
+// Classes
 class Budget {
     constructor( budget, remaningBudget ) {
         this.budget = budget;
@@ -23,7 +23,7 @@ class Budget {
 
     addBill( bill ) {
         this.bills = [ ...this.bills, bill ];
-        ui.emptyBillMsg();
+        // ui.emptyBillMsg();
         // ToDo - Eliminar msg y que aparezca si es necesario
     }
 
@@ -31,7 +31,7 @@ class Budget {
         const spent = this.bills.reduce( ( total, acc ) => total + acc.billAmount, 0 );
         this.remaningBudget = this.budget - spent;
         ui.updateRemaning( this.remaningBudget );
-        ui.calcRemaning();
+        ui.remaningValidations();
     }
 }
 
@@ -69,21 +69,21 @@ class Ui {
         remaning.textContent = value;
     }
 
-    emptyBillMsg() {
-        const msg = document.querySelector('#bills p');
+    // emptyBillMsg() {
+    //     const msg = document.querySelector('#bills p');
 
-        if ( budget.bills.length === 1 ) {
-            msg.remove();
-            return;
-        };
+    //     if ( budget.bills.length === 0 ) {
+    //         return;
+    //      } else if ( budget.bills.length === 1 ) {
+    //         msg.remove();
+    //         return;
+    //     };        
+    // }
 
-        if ( budget.bills.length === 0  ) {
-            // ToDo - Hacer aparecer el msg
-        }
-    }
-
-    calcRemaning() {
+    remaningValidations() {
         const remaning = budget.remaningBudget;
+        const msgNegative = document.querySelector('p.msg-negative'); 
+        const budgetBoxNegative = document.querySelector('#remaning-budget p');; 
 
         if ( remaning < 0 ) {
             document.querySelector('p.budget.remaning').classList.add('negative');       
@@ -92,21 +92,25 @@ class Ui {
             negativeBudgetMsg.textContent = 'You are in negative, you have to delete some expense to add another.';
             negativeBudgetMsg.classList.add('msg-negative')
 
-            const msgPos = document.querySelector('.secundario');
+            const msgPos = document.querySelector('.secondary');
             msgPos.insertBefore(negativeBudgetMsg, msgPos.children[1] );
 
-            // Desabilitamos el formulario
             addBtn.disabled = true;
+            return;
         } 
 
+        if ( remaning > 0 && msgNegative ) {
+            msgNegative.remove();
+            budgetBoxNegative.classList.remove('negative');
+            addBtn.disabled = false;        
+        }
     }
-
 }
 
 let budget;
 let ui;
 
-// Funciones
+// Functions
 function getBudget() {
 
     let budgetUser = budgetIn.value;
@@ -151,8 +155,11 @@ function newBill(e) {
     formBudget.reset();
 }
 
-function deleteBill() {
-    console.log('asd');
+function deleteBill( id ) {
+    budget.bills = budget.bills.filter( bill => { return bill.id !== id } );
+    printsBillsHTML();
+    budget.calcRemaning();
+    ui.remaningValidations();
 }
 
 function printsBillsHTML() {
@@ -170,6 +177,9 @@ function printsBillsHTML() {
         
         const btnDelete = document.createElement('button');
         btnDelete.classList.add('btn', 'btn-danger', 'delete-bill');
+        btnDelete.onclick = () => {
+            deleteBill(id);
+        }
         btnDelete.textContent = "Delete"
 
         newBillBox.appendChild(btnDelete);
