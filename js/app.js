@@ -22,13 +22,55 @@ class Budget {
     addBill( bill ) {
         this.bills = [ ...this.bills, bill ];
     }
+
+    calcRemaining() {
+        const spent = this.bills.reduce( ( total, acc ) => total + acc.billAmount, 0 );
+        this.remainingBudget = this.budget - spent;
+        ui.updateRemaining( this.remainingBudget );
+    }
+}
+
+class Ui {
+
+    insertInitialBudget( value ) {
+        const budgetBox = document.createElement('p');
+        budgetBox.classList.add('actual','budget');
+        budgetBox.textContent = `Your original budget is: `;
+
+        const budgetValue = document.createElement('span');
+        budgetValue.id = 'total';
+        budgetValue.textContent = value;
+
+        originalBudget.appendChild(budgetBox);
+        budgetBox.appendChild(budgetValue);
+    }
+
+    insertRemBudget( value ) {
+        const budgetRestBox = document.createElement('p');
+        budgetRestBox.classList.add('remaning','budget');
+        budgetRestBox.textContent = `Your actual budget is: `;
+    
+        const budgetRest = document.createElement('span');
+        budgetRest.id = 'budgetRest';
+        budgetRest.textContent = value;
+    
+        remainingBudget.appendChild(budgetRestBox);
+        budgetRestBox.appendChild(budgetRest);
+    }
+    
+    updateRemaining( value ) {
+        let remaning = document.querySelector('#budgetRest');
+        remaning.value = value;
+        remaning.textContent = value;
+    }
 }
 
 let budget;
+let ui;
 
 // Funciones
 function getBudget() {
-    
+
     let budgetUser = budgetIn.value;
 
     if ( budgetUser === '' ) {
@@ -42,34 +84,11 @@ function getBudget() {
         return;
     }
     budgetSection.remove();
-    insertData( validBudge );
-}
 
-function insertData( value ) {
-
-    const budgetBox = document.createElement('p');
-    budgetBox.classList.add('actual','budget');
-    budgetBox.textContent = `Your original budget is: `;
-
-    const budgetValue = document.createElement('span');
-    budgetValue.id = 'total';
-    budgetValue.textContent = value;
-
-    const budgetRestBox = document.createElement('p');
-    budgetRestBox.classList.add('remaning','budget');
-    budgetRestBox.textContent = `Your actual budget is: `;
-
-    const budgetRest = document.createElement('span');
-    budgetRest.id = 'budgetRest';
-    budgetRest.textContent = value;
-    
-    originalBudget.appendChild(budgetBox);
-    budgetBox.appendChild(budgetValue);
-
-    remainingBudget.appendChild(budgetRestBox);
-    budgetRestBox.appendChild(budgetRest);
-
-    budget = new Budget(value, value);
+    budget = new Budget(validBudge, validBudge);
+    ui = new Ui;
+    ui.insertInitialBudget( validBudge );
+    ui.insertRemBudget( validBudge);
 }
 
 function newBill(e) {
@@ -89,7 +108,8 @@ function newBill(e) {
 
     const bill = { billName, billAmount, id: Date.now() }
     budget.addBill(bill);
-    printsBillsHTML( )
+    budget.calcRemaining();
+    printsBillsHTML();
     formBudget.reset();
 }
 
@@ -116,7 +136,6 @@ function printsBillsHTML() {
 }
 
 function cleanHTML() {
-    console.log('asd');
     while( billList.firstChild ) {
         billList.removeChild( billList.firstChild);
     }
